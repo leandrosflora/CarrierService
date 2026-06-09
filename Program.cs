@@ -53,8 +53,8 @@ builder.Services
     })
     .AddStandardResilienceHandler(options => ConfigureStandardResilience(
         options,
-        totalRequestTimeout: TimeSpan.FromSeconds(2),
-        attemptTimeout: TimeSpan.FromMilliseconds(700),
+        totalRequestTimeout: TimeSpan.FromSeconds(3),
+        attemptTimeout: TimeSpan.FromSeconds(2),
         maxRetryAttempts: 1,
         failureRatio: 0.5,
         minimumThroughput: 10,
@@ -70,7 +70,7 @@ builder.Services
     .AddStandardResilienceHandler(options => ConfigureStandardResilience(
         options,
         totalRequestTimeout: TimeSpan.FromSeconds(3),
-        attemptTimeout: TimeSpan.FromSeconds(1),
+        attemptTimeout: TimeSpan.FromSeconds(2),
         maxRetryAttempts: 1,
         failureRatio: 0.4,
         minimumThroughput: 8,
