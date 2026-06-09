@@ -10,6 +10,7 @@ using CarrierService.Infrastructure.Workers;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Http.Resilience;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,16 +51,15 @@ builder.Services
         client.BaseAddress = new Uri(builder.Configuration["Carriers:Meli:BaseUrl"] ?? "http://localhost:8081");
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     })
-    .AddStandardResilienceHandler(options =>
-    {
-        options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(2);
-        options.AttemptTimeout.Timeout = TimeSpan.FromMilliseconds(700);
-        options.Retry.MaxRetryAttempts = 1;
-        options.CircuitBreaker.FailureRatio = 0.5;
-        options.CircuitBreaker.MinimumThroughput = 10;
-        options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
-        options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(20);
-    });
+    .AddStandardResilienceHandler(options => ConfigureStandardResilience(
+        options,
+        totalRequestTimeout: TimeSpan.FromSeconds(2),
+        attemptTimeout: TimeSpan.FromMilliseconds(700),
+        maxRetryAttempts: 1,
+        failureRatio: 0.5,
+        minimumThroughput: 10,
+        samplingDuration: TimeSpan.FromSeconds(30),
+        breakDuration: TimeSpan.FromSeconds(20)));
 
 builder.Services
     .AddHttpClient<ExternalCarrierAdapter>(client =>
@@ -67,16 +67,15 @@ builder.Services
         client.BaseAddress = new Uri(builder.Configuration["Carriers:External:BaseUrl"] ?? "http://localhost:8082");
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     })
-    .AddStandardResilienceHandler(options =>
-    {
-        options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(3);
-        options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(1);
-        options.Retry.MaxRetryAttempts = 1;
-        options.CircuitBreaker.FailureRatio = 0.4;
-        options.CircuitBreaker.MinimumThroughput = 8;
-        options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
-        options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);
-    });
+    .AddStandardResilienceHandler(options => ConfigureStandardResilience(
+        options,
+        totalRequestTimeout: TimeSpan.FromSeconds(3),
+        attemptTimeout: TimeSpan.FromSeconds(1),
+        maxRetryAttempts: 1,
+        failureRatio: 0.4,
+        minimumThroughput: 8,
+        samplingDuration: TimeSpan.FromSeconds(30),
+        breakDuration: TimeSpan.FromSeconds(30)));
 
 builder.Services.AddTransient<ICarrierAdapter>(provider => provider.GetRequiredService<MeliLogisticsAdapter>());
 builder.Services.AddTransient<ICarrierAdapter>(provider => provider.GetRequiredService<ExternalCarrierAdapter>());
@@ -114,3 +113,32 @@ app.MapCarrierAvailabilityEndpoints();
 app.MapCarrierAdministrationEndpoints();
 
 app.Run();
+
+void ConfigureStandardResilience(
+    HttpStandardResilienceOptions options,
+    TimeSpan totalRequestTimeout,
+    TimeSpan attemptTimeout,
+    int maxRetryAttempts,
+    double failureRatio,
+    int minimumThroughput,
+    TimeSpan samplingDuration,
+    TimeSpan breakDuration)
+{
+    ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(totalRequestTimeout, attemptTimeout);
+
+    if (samplingDuration < attemptTimeout * 2)
+    {
+        throw new ArgumentOutOfRangeException(
+            nameof(samplingDuration),
+            samplingDuration,
+            "Circuit breaker sampling duration must be at least double the attempt timeout.");
+    }
+
+    options.TotalRequestTimeout.Timeout = totalRequestTimeout;
+    options.AttemptTimeout.Timeout = attemptTimeout;
+    options.Retry.MaxRetryAttempts = maxRetryAttempts;
+    options.CircuitBreaker.FailureRatio = failureRatio;
+    options.CircuitBreaker.MinimumThroughput = minimumThroughput;
+    options.CircuitBreaker.SamplingDuration = samplingDuration;
+    options.CircuitBreaker.BreakDuration = breakDuration;
+}
