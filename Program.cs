@@ -41,7 +41,14 @@ builder.Services.AddScoped<CarrierAvailabilityService>();
 builder.Services.AddScoped<CarrierStaticRuleEvaluator>();
 builder.Services.AddScoped<CarrierStatusService>();
 
-builder.Services.AddScoped<ICarrierRepository, CarrierRepository>();
+if (builder.Configuration.GetValue<bool>("FeatureFlags:MockCarrierRepository"))
+{
+    builder.Services.AddScoped<ICarrierRepository, MockCarrierRepository>();
+}
+else
+{
+    builder.Services.AddScoped<ICarrierRepository, CarrierRepository>();
+}
 builder.Services.AddScoped<ICarrierProfileCache, RedisCarrierProfileCache>();
 builder.Services.AddScoped<IOutboxWriter, OutboxWriter>();
 
@@ -83,9 +90,13 @@ builder.Services.AddSingleton<CarrierAdapterFactory>();
 
 builder.Services.AddHostedService<CarrierHealthRefreshWorker>();
 
-builder.Services.AddHealthChecks()
-    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
-    .AddDbContextCheck<CarrierDbContext>(tags: ["ready"]);
+var healthChecks = builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"]);
+
+if (!builder.Configuration.GetValue<bool>("FeatureFlags:MockCarrierRepository"))
+{
+    healthChecks.AddDbContextCheck<CarrierDbContext>(tags: ["ready"]);
+}
 
 var app = builder.Build();
 
