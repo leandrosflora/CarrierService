@@ -11,11 +11,11 @@ public enum CarrierStatus
 
 public enum TransportMode
 {
-    Road = 1,
-    Air = 2,
-    Rail = 3,
-    InternalTransfer = 4,
-    LastMile = 5
+    FULFILLMENT = 1,
+    FLEX = 2,
+    CROSSDOCKING = 3,
+    SELLERSHIPPING = 4,
+    CARRIER = 5
 }
 
 public enum CarrierAvailabilityReason

@@ -114,7 +114,7 @@ public sealed class CarrierAvailabilityService
                 localResults[check.CheckId] = Unavailable(
                     original,
                     CarrierAvailabilityReason.PartnerUnavailable,
-                    "AdapterMissing");
+                    "External");
             }
 
             return localResults.Values.ToList();
@@ -161,7 +161,7 @@ public sealed class CarrierAvailabilityService
                 localResults[check.CheckId] = Unavailable(
                     original,
                     CarrierAvailabilityReason.PartnerUnavailable,
-                    "CircuitBreakerOrTimeout");
+                    "External");
             }
         }
 
@@ -222,8 +222,8 @@ public sealed class CarrierAvailabilityService
         if (request.Checks.Count == 0)
             throw new ArgumentException("At least one check is required");
 
-        if (request.Checks.Count > 100)
-            throw new ArgumentException("A maximum of 100 checks is allowed");
+        if (request.Checks.Count > 20)
+            throw new ArgumentException("A maximum of 20 checks is allowed");
 
         var duplicatedIds = request.Checks
             .GroupBy(x => x.CheckId)
@@ -241,6 +241,9 @@ public sealed class CarrierAvailabilityService
 
             if (string.IsNullOrWhiteSpace(check.CarrierCode))
                 throw new ArgumentException("CarrierCode is required");
+
+            if (string.IsNullOrWhiteSpace(check.ServiceLevelCode))
+                throw new ArgumentException("ServiceLevelCode is required");
 
             if (check.OriginNodeId == Guid.Empty || check.DestinationNodeId == Guid.Empty)
                 throw new ArgumentException("Origin and destination nodes are required");

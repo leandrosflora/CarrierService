@@ -6,6 +6,7 @@ using CarrierService.Application.Ports;
 using CarrierService.Infrastructure.Cache;
 using CarrierService.Infrastructure.Outbox;
 using CarrierService.Infrastructure.Persistence;
+using CarrierService.Infrastructure.Serialization;
 using CarrierService.Infrastructure.Workers;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.SerializerOptions.Converters.Add(new TimeOnlyHHmmConverter());
 });
 
 var carrierDbConnectionString = builder.Configuration.GetConnectionString("CarrierDb")

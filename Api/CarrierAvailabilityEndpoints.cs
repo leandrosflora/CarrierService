@@ -7,7 +7,7 @@ public static class CarrierAvailabilityEndpoints
 {
     public static IEndpointRouteBuilder MapCarrierAvailabilityEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/carrier-availability").WithTags("Carrier Availability");
+        var group = app.MapGroup("/v1/carrier-availability").WithTags("Carrier Availability");
 
         group.MapPost("/search", async (
             SearchCarrierAvailabilityRequest request,

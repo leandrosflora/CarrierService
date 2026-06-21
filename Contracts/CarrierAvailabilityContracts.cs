@@ -6,7 +6,7 @@ public sealed record SearchCarrierAvailabilityRequest(
 public sealed record CarrierAvailabilityCheckRequest(
     string CheckId,
     string CarrierCode,
-    string? ServiceLevelCode,
+    string ServiceLevelCode,
     Guid OriginNodeId,
     Guid DestinationNodeId,
     string DestinationPostalCode,

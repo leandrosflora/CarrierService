@@ -5,13 +5,19 @@ namespace CarrierService.Contracts;
 public sealed record CarrierStatusWebhookRequest(
     string EventId,
     string Status,
-    string Reason,
     DateTimeOffset OccurredAt,
-    string Signature);
+    string? Reason,
+    string? Signature);
 
 public sealed record ChangeCarrierStatusRequest(
     CarrierStatus Status,
-    string Reason);
+    string? Reason);
+
+public sealed record CarrierProfileResponse(
+    string Code,
+    string Name,
+    CarrierStatus Status,
+    bool RequiresRealTimeValidation);
 
 public sealed record CreateCarrierRequest(
     string Code,

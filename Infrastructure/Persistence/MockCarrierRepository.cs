@@ -69,7 +69,7 @@ public sealed class MockCarrierRepository : ICarrierRepository
             [
                 new CarrierServiceLevelSnapshot(
                     "STANDARD",
-                    TransportMode.Road,
+                    TransportMode.FULFILLMENT,
                     MaximumWeightKg: 30,
                     MaximumCubicWeightKg: 50,
                     SupportsFragileItems: true,
@@ -92,7 +92,7 @@ public sealed class MockCarrierRepository : ICarrierRepository
                     ]),
                 new CarrierServiceLevelSnapshot(
                     "EXPRESS",
-                    TransportMode.Air,
+                    TransportMode.FLEX,
                     MaximumWeightKg: 10,
                     MaximumCubicWeightKg: 20,
                     SupportsFragileItems: true,

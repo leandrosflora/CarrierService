@@ -11,15 +11,22 @@ public static class CarrierAdministrationEndpoints
 {
     public static IEndpointRouteBuilder MapCarrierAdministrationEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/carriers").WithTags("Carrier Administration");
+        var group = app.MapGroup("/v1/carriers").WithTags("Carrier Administration");
 
         group.MapGet("/{carrierCode}", async (
             string carrierCode,
             ICarrierRepository repository,
             CancellationToken cancellationToken) =>
         {
-            var profile = await repository.GetProfileAsync(carrierCode, cancellationToken);
-            return profile is null ? Results.NotFound() : Results.Ok(profile);
+            var carrier = await repository.GetByCodeAsync(carrierCode, cancellationToken);
+            if (carrier is null)
+                return Results.NotFound();
+
+            return Results.Ok(new CarrierProfileResponse(
+                carrier.Code,
+                carrier.Name,
+                carrier.Status,
+                carrier.RequiresRealTimeValidation));
         });
 
         group.MapPatch("/{carrierCode}/status", async (
@@ -28,7 +35,7 @@ public static class CarrierAdministrationEndpoints
             CarrierStatusService service,
             CancellationToken cancellationToken) =>
         {
-            await service.ChangeStatusAsync(carrierCode, request.Status, request.Reason, cancellationToken);
+            await service.ChangeStatusAsync(carrierCode, request.Status, request.Reason ?? string.Empty, cancellationToken);
             return Results.NoContent();
         });
 
@@ -40,7 +47,7 @@ public static class CarrierAdministrationEndpoints
         {
             var status = Enum.Parse<CarrierStatus>(request.Status, ignoreCase: true);
 
-            await service.ChangeStatusAsync(carrierCode, status, request.Reason, cancellationToken);
+            await service.ChangeStatusAsync(carrierCode, status, request.Reason ?? string.Empty, cancellationToken);
             return Results.Accepted();
         });
 
