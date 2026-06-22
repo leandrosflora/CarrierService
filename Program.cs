@@ -26,7 +26,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var carrierDbConnectionString = builder.Configuration.GetConnectionString("CarrierDb")
-    ?? "Host=localhost;Port=5432;Database=carrier_service;Username=postgres;Password=postgres";
+    ?? "Host=localhost;Port=5432;Database=logistica_envios;Username=logistica;Password=logistica;Search Path=carrier,public";
 
 builder.Services.AddDbContext<CarrierDbContext>(options =>
 {
