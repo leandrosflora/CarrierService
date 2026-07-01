@@ -80,12 +80,12 @@ builder.Services
     })
     .AddStandardResilienceHandler(options => ConfigureStandardResilience(
         options,
-        totalRequestTimeout: TimeSpan.FromSeconds(3),
-        attemptTimeout: TimeSpan.FromSeconds(2),
+        totalRequestTimeout: TimeSpan.FromSeconds(60),
+        attemptTimeout: TimeSpan.FromSeconds(20),
         maxRetryAttempts: 1,
         failureRatio: 0.5,
         minimumThroughput: 10,
-        samplingDuration: TimeSpan.FromSeconds(30),
+        samplingDuration: TimeSpan.FromSeconds(60),
         breakDuration: TimeSpan.FromSeconds(20)));
 
 builder.Services
@@ -96,13 +96,13 @@ builder.Services
     })
     .AddStandardResilienceHandler(options => ConfigureStandardResilience(
         options,
-        totalRequestTimeout: TimeSpan.FromSeconds(3),
-        attemptTimeout: TimeSpan.FromSeconds(2),
+        totalRequestTimeout: TimeSpan.FromSeconds(30),
+        attemptTimeout: TimeSpan.FromSeconds(20),
         maxRetryAttempts: 1,
         failureRatio: 0.4,
         minimumThroughput: 8,
-        samplingDuration: TimeSpan.FromSeconds(30),
-        breakDuration: TimeSpan.FromSeconds(30)));
+        samplingDuration: TimeSpan.FromSeconds(60),
+        breakDuration: TimeSpan.FromSeconds(60)));
 
 builder.Services.AddTransient<ICarrierAdapter>(provider => provider.GetRequiredService<MeliLogisticsAdapter>());
 builder.Services.AddTransient<ICarrierAdapter>(provider => provider.GetRequiredService<ExternalCarrierAdapter>());

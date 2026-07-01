@@ -17,6 +17,7 @@ public sealed class MockCarrierRepository : ICarrierRepository
         new Dictionary<string, CarrierProfileSnapshot>(StringComparer.OrdinalIgnoreCase)
         {
             ["MELI"] = CreateProfile(MeliCarrierId, "MELI", requiresRealTimeValidation: false),
+            ["MELI_LOG"] = CreateProfile(MeliCarrierId, "MELI_LOG", requiresRealTimeValidation: false),
             ["EXTERNAL"] = CreateProfile(ExternalCarrierId, "EXTERNAL", requiresRealTimeValidation: false)
         };
 

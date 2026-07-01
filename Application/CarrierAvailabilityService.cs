@@ -172,31 +172,31 @@ public sealed class CarrierAvailabilityService
         string carrierCode,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var cached = await _cache.GetAsync(carrierCode, cancellationToken);
+        //try
+        //{
+        //    var cached = await _cache.GetAsync(carrierCode, cancellationToken);
 
-            if (cached is not null)
-                return cached;
-        }
-        catch (Exception exception) when (exception is not OperationCanceledException)
-        {
-            _logger.LogWarning(exception, "Could not read carrier profile from cache");
-        }
+        //    if (cached is not null)
+        //        return cached;
+        //}
+        //catch (Exception exception) when (exception is not OperationCanceledException)
+        //{
+        //    _logger.LogWarning(exception, "Could not read carrier profile from cache");
+        //}
 
         var profile = await _repository.GetProfileAsync(carrierCode, cancellationToken);
 
         if (profile is null)
             return null;
 
-        try
-        {
-            await _cache.SetAsync(profile, ProfileCacheTtl, cancellationToken);
-        }
-        catch (Exception exception) when (exception is not OperationCanceledException)
-        {
-            _logger.LogWarning(exception, "Could not store carrier profile in cache");
-        }
+        //try
+        //{
+        //    await _cache.SetAsync(profile, ProfileCacheTtl, cancellationToken);
+        //}
+        //catch (Exception exception) when (exception is not OperationCanceledException)
+        //{
+        //    _logger.LogWarning(exception, "Could not store carrier profile in cache");
+        //}
 
         return profile;
     }
