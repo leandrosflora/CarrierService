@@ -48,8 +48,8 @@ public sealed class CarrierStaticRuleEvaluator
             if (lane is null)
                 continue;
 
-            if (!OperatesAt(lane, check.PlannedDepartureAtUtc))
-                continue;
+            //if (!OperatesAt(lane, check.PlannedDepartureAtUtc))
+            //    continue;
 
             return new StaticCarrierEvaluation(
                 true,
@@ -91,8 +91,7 @@ public sealed class CarrierStaticRuleEvaluator
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(lane.TimeZoneId);
         var localDeparture = TimeZoneInfo.ConvertTime(plannedDepartureUtc, timeZone);
 
-        return lane.OperatingDays.Contains(localDeparture.DayOfWeek)
-            && TimeOnly.FromDateTime(localDeparture.DateTime) <= lane.CutoffTime;
+        return lane.OperatingDays.Contains(localDeparture.DayOfWeek);
     }
 
     private static StaticCarrierEvaluation DetermineFailure(
